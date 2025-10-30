@@ -1,46 +1,52 @@
 <?php
-namespace arnaullfe\Verifactu\models\parts\cuerpo;
+namespace arnaullfe\Verifactu\Models;
 
-use arnaullfe\Verifactu\models\extra\VerifactuTipoFactura;
+use arnaullfe\Verifactu\Models\TipoFactura;
+use arnaullfe\Verifactu\Models\IdentificacionFiscal;
+use arnaullfe\Verifactu\Models\IdentificacionFiscalExtranjera;
 
 /**
- * Cuerpo de la factura
+ * Contiene el contenido principal de la factura con todos sus datos
  */
-class VerifactuCuerpo {
+class CuerpoFactura {
     public string $idVersion = '1.0';
-    public VerifactuCuerpoIdFactura $idFactura;
+    public IdFactura $idFactura;
     public string $nombreRazonEmisor;
     public string $tipoFactura;
     public string $descripcionOperacion;
-    /** @var VerifactuFiscalIdentifier[]|VerifactuForeignFiscalIdentifier[] */
+    /** @var IdentificacionFiscal[]|IdentificacionFiscalExtranjera[] */
     public array $destinatarios;
     public float $cuotaTotal;
     public float $importeTotal;
-    public $sistemaInformatico; // keep flexible due to external edit
-    /** @var VerifactuCuerpoDesglose[] */
+    public $sistemaInformatico; // Se mantiene flexible para ediciones externas
+    /** @var LineaFactura[] */
     public array $desglose;
     public string $tipoHuella = '01';
-    public ?VerifactuCuerpoRegistroAnterior $registroAnterior = null;
+    public ?RegistroAnterior $registroAnterior = null;
 
+    /**
+     * Valida todos los datos del cuerpo de la factura
+     * @return array Lista de errores encontrados
+     */
     public function validate(): array {
         $errors = [];
         if ($this->idFactura) {
             $errors = $this->idFactura->validate("Cuerpo idFactura: ");
         } else {
-            $errors[] = "Cuerpo idFactura: IDFactura is required";
+            $errors[] = "Cuerpo idFactura: El identificador de factura es obligatorio";
         }
         if (!$this->nombreRazonEmisor) {
-            $errors[] = "Cuerpo nombreRazonEmisor: NombreRazonEmisor is required";
+            $errors[] = "Cuerpo nombreRazonEmisor: El nombre o razón social del emisor es obligatorio";
         } elseif (strlen($this->nombreRazonEmisor) > 120) {
-            $errors[] = "Cuerpo nombreRazonEmisor: NombreRazonEmisor must be less than 120 characters";
+            $errors[] = "Cuerpo nombreRazonEmisor: El nombre no puede exceder 120 caracteres";
         }
         if (!$this->tipoFactura) {
-            $errors[] = "Cuerpo tipoFactura: TipoFactura is required";
+            $errors[] = "Cuerpo tipoFactura: El tipo de factura es obligatorio";
         }
         if (!$this->destinatarios) {
-            $errors[] = "Cuerpo destinatarios: Destinatarios is required";
+            $errors[] = "Cuerpo destinatarios: Debe haber al menos un destinatario";
         } elseif (count($this->destinatarios) === 0) {
-            $errors[] = "Cuerpo destinatarios: Destinatarios must be an array with at least one element";
+            $errors[] = "Cuerpo destinatarios: Debe haber al menos un destinatario";
         } else {
             $destinatariosErrors = [];
             for ($index = 0; $index < count($this->destinatarios); $index++) {
@@ -54,18 +60,18 @@ class VerifactuCuerpo {
             }
         }
         if (!isset($this->cuotaTotal)) {
-            $errors[] = "Cuerpo cuotaTotal: CuotaTotal is required";
+            $errors[] = "Cuerpo cuotaTotal: La cuota total es obligatoria";
         }
         if (!isset($this->importeTotal)) {
-            $errors[] = "Cuerpo importeTotal: ImporteTotal is required";
+            $errors[] = "Cuerpo importeTotal: El importe total es obligatorio";
         }
         if (!$this->sistemaInformatico) {
-            $errors[] = "Cuerpo sistemaInformatico: SistemaInformatico is required";
+            $errors[] = "Cuerpo sistemaInformatico: El sistema informático es obligatorio";
         }
         if (!$this->desglose) {
-            $errors[] = "Cuerpo desglose: Desglose is required";
+            $errors[] = "Cuerpo desglose: El desglose es obligatorio";
         } elseif (count($this->desglose) === 0) {
-            $errors[] = "Cuerpo desglose: Desglose must be an array with at least one element";
+            $errors[] = "Cuerpo desglose: Debe haber al menos una línea en el desglose";
         } else {
             $desgloseErrors = [];
             for ($index = 0; $index < count($this->desglose); $index++) {
@@ -81,6 +87,10 @@ class VerifactuCuerpo {
         return $errors;
     }
 
+    /**
+     * Convierte el cuerpo de la factura a formato array
+     * @return array
+     */
     public function toArray(): array {
         $encadenamiento = [];
         if ($this->registroAnterior) {
@@ -112,6 +122,10 @@ class VerifactuCuerpo {
         ];
     }
 
+    /**
+     * Calcula la huella digital de la factura según el algoritmo SHA-256
+     * @return string Huella en hexadecimal mayúsculas
+     */
     public function calculateHuella(): string {
         $payload = 'IDEmisorFactura=' . $this->idFactura->idEmisorFactura
             . '&NumSerieFactura=' . $this->idFactura->numSerieFactura

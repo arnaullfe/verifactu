@@ -1,10 +1,10 @@
 <?php
-namespace arnaullfe\Verifactu\models\parts\cuerpo;
+namespace arnaullfe\Verifactu\Models;
 
 /**
- * Registro anterior de la factura
+ * Almacena la información de un registro anterior relacionado con la factura
  */
-class VerifactuCuerpoRegistroAnterior {
+class RegistroAnterior {
     public string $idEmisorFactura;
     public string $numSerieFactura;
     public \DateTime $fechaExpedicionFactura;
@@ -17,6 +17,10 @@ class VerifactuCuerpoRegistroAnterior {
         $this->huella = $huella;
     }
 
+    /**
+     * Convierte el registro anterior a formato array
+     * @return array
+     */
     public function toArray(): array {
         return [
             'IDEmisorFactura' => $this->idEmisorFactura,

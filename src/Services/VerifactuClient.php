@@ -1,8 +1,9 @@
 <?php
 
-namespace arnaullfe\Verifactu\services;
+namespace arnaullfe\Verifactu\Services;
 
-use arnaullfe\Verifactu\models\VerifactuFactura;
+use arnaullfe\Verifactu\Models\Respuestas\VerifactuRespuestas;
+use arnaullfe\Verifactu\Models\Factura;
 
 class VerifactuClient {
     private bool $isProduction = false;
@@ -24,7 +25,7 @@ class VerifactuClient {
         );
         exec($command, $output, $status);
         if ($status !== 0) {
-            throw new \RuntimeException('Failed to convert PFX to PEM');
+            throw new \RuntimeException('Error al convertir el certificado PFX a PEM');
         }
         return $pemPath;
     }
@@ -39,14 +40,14 @@ class VerifactuClient {
         }
     }
 
-    public function enviarFactura(VerifactuFactura $factura): array {
+    public function enviarFactura(Factura $factura): array {
         try {
             $errors = $factura->validate();
             if (count($errors) > 0) {
                 throw new \InvalidArgumentException(implode("\n", $errors));
             }
             if ($this->certificatePath === null || $this->certificatePassword === null) {
-                throw new \InvalidArgumentException('Certificate path and password are required');
+                throw new \InvalidArgumentException('La ruta del certificado y la contraseña son obligatorias');
             }
             $wsdlUrl = $this->getWsdlUrl();
 
@@ -68,19 +69,29 @@ class VerifactuClient {
             $client = new \SoapClient($wsdlUrl, $options);
             $client->__setLocation($this->getUrlEndpoint());
             $result = $client->__soapCall('RegFactuSistemaFacturacion', [$factura->toArray()]);
-
+            $isSuccess = false;
+            $message = "Error al enviar la factura";
+            if (strtoupper($result->EstadoEnvio) === VerifactuRespuestas::CORRECTO) {
+                $isSuccess = true;
+                $message = "Factura enviada correctamente";
+            } elseif (strtoupper($result->EstadoEnvio) === VerifactuRespuestas::ACEPTADO_CON_ERRORES) {
+                $isSuccess = true;
+                $message = "Factura enviada con errores";
+            }else if(!empty($result->RespuestaLinea) && !empty($result->RespuestaLinea->DescripcionErrorRegistro)){
+                $message .= ": " . $result->RespuestaLinea->DescripcionErrorRegistro;
+            }
             $this->deleteCertificate();
             return [
-                'success' => true,
-                'message' => is_string($result) ? $result : json_encode($result),
-                'messageType' => 'success',
+                'success' => $isSuccess,
+                'message' => $message,
+                'data' => $result,
             ];
         } catch (\Throwable $error) {
             $this->deleteCertificate();
             return [
                 'success' => false,
-                'message' => method_exists($error, 'getMessage') ? $error->getMessage() : 'Unknown error',
-                'messageType' => 'text',
+                'message' => method_exists($error, 'getMessage') ? $error->getMessage() : 'Error desconocido',
+                'data' => $error,
             ];
         }
     }

@@ -1,9 +1,9 @@
 <?php
-namespace arnaullfe\Verifactu\models\extra;
+namespace arnaullfe\Verifactu\Models;
 /**
- * Tipos de Factura (VerifactuTipoFactura equivalente)
+ * Enumeración con los diferentes tipos de factura según Verifactu
  */
-enum VerifactuTipoFactura: string {
+enum TipoFactura: string {
     const FACTURA = 'F1'; // Factura
     const SIMPLIFICADA = 'F2'; // Simplificada
     const SUSTITUTIVA = 'F3'; // Sustitutiva

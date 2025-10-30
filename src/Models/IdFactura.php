@@ -1,9 +1,9 @@
 <?php
-namespace arnaullfe\Verifactu\models\parts\cuerpo;
+namespace arnaullfe\Verifactu\Models;
 /**
- * Identificador de factura en el cuerpo
+ * Contiene la información que identifica una factura de forma única
  */
-class VerifactuCuerpoIdFactura {
+class IdFactura {
     public string $idEmisorFactura;
     public string $numSerieFactura;
     public \DateTime $fechaExpedicionFactura;
@@ -14,26 +14,35 @@ class VerifactuCuerpoIdFactura {
         $this->fechaExpedicionFactura = $fechaExpedicionFactura;
     }
 
+    /**
+     * Valida los datos del identificador de factura
+     * @param string $prefix Prefijo para los mensajes de error
+     * @return array Lista de errores encontrados
+     */
     public function validate(string $prefix = ""): array {
         $errors = [];
         if (!$this->idEmisorFactura) {
-            $errors[] = $prefix . "IDEmisorFactura is required";
+            $errors[] = $prefix . "El ID del emisor es obligatorio";
         } elseif (strlen($this->idEmisorFactura) !== 9) {
-            $errors[] = $prefix . "IDEmisorFactura must be 9 characters";
+            $errors[] = $prefix . "El ID del emisor debe tener 9 caracteres";
         }
         if (!$this->numSerieFactura) {
-            $errors[] = $prefix . "NumSerieFactura is required";
+            $errors[] = $prefix . "El número de serie es obligatorio";
         } elseif (strlen($this->numSerieFactura) > 60) {
-            $errors[] = $prefix . "NumSerieFactura must be less than 60 characters";
+            $errors[] = $prefix . "El número de serie no puede exceder 60 caracteres";
         }
         if (!$this->fechaExpedicionFactura) {
-            $errors[] = $prefix . "FechaExpedicionFactura is required";
+            $errors[] = $prefix . "La fecha de expedición es obligatoria";
         } elseif (!($this->fechaExpedicionFactura instanceof \DateTime)) {
-            $errors[] = $prefix . "FechaExpedicionFactura must be a valid DateTime";
+            $errors[] = $prefix . "La fecha debe ser una instancia válida de DateTime";
         }
         return $errors;
     }
 
+    /**
+     * Convierte el identificador a formato array
+     * @return array
+     */
     public function toArray(): array {
         return [
             'IDEmisorFactura' => $this->idEmisorFactura,

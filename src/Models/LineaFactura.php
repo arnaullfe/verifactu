@@ -1,15 +1,15 @@
 <?php
-namespace arnaullfe\Verifactu\models\parts\cuerpo;
+namespace arnaullfe\Verifactu\Models;
 
+use arnaullfe\Verifactu\Models\TipoImpuesto;
+use arnaullfe\Verifactu\Models\TipoRegimen;
+use arnaullfe\Verifactu\Models\TipoOperacion;
 
-use arnaullfe\Verifactu\models\extra\VerifactuTaxType;
-use arnaullfe\Verifactu\models\extra\VerifactuRegimeType;
-use arnaullfe\Verifactu\models\extra\VerifactuOperationType;
 /**
- * Detalle de desglose
+ * Representa una línea de desglose de impuestos en la factura
  * @field DetalleDesglose
  */
-class VerifactuCuerpoDesglose {
+class LineaFactura {
     public string $tipoImpuesto;
     public string $claveRegimen;
     public string $calificacionOperacion;
@@ -17,7 +17,7 @@ class VerifactuCuerpoDesglose {
     public ?string $tipoImpositivo = null;
     public ?string $cuotaRepercutida = null;
 
-    public function __construct($baseImponibleOimporteNoSujeto, $cuotaRepercutida, $tipoImpositivo = '21.00',$tipoImpuesto = VerifactuTaxType::IVA, $claveRegimen = VerifactuRegimeType::C01, $calificacionOperacion = VerifactuOperationType::Subject) {
+    public function __construct($baseImponibleOimporteNoSujeto, $cuotaRepercutida, $tipoImpositivo = '21.00',$tipoImpuesto = TipoImpuesto::IVA, $claveRegimen = TipoRegimen::C01, $calificacionOperacion = TipoOperacion::Subject) {
         $this->tipoImpuesto = $tipoImpuesto;
         $this->claveRegimen = $claveRegimen;
         $this->calificacionOperacion = $calificacionOperacion;
@@ -26,25 +26,30 @@ class VerifactuCuerpoDesglose {
         $this->cuotaRepercutida = $cuotaRepercutida;
     }
 
+    /**
+     * Valida los datos de la línea de factura
+     * @param string $prefix Prefijo para los mensajes de error
+     * @return array Lista de errores encontrados
+     */
     public function validate(string $prefix = ""): array {
         $errors = [];
         if (!$this->tipoImpuesto) {
-            $errors[] = $prefix . "TipoImpuesto is required";
+            $errors[] = $prefix . "El tipo de impuesto es obligatorio";
         }
         if (!$this->claveRegimen) {
-            $errors[] = $prefix . "ClaveRegimen is required";
+            $errors[] = $prefix . "La clave de régimen es obligatoria";
         }
         if (!$this->calificacionOperacion) {
-            $errors[] = $prefix . "CalificacionOperacion is required";
+            $errors[] = $prefix . "La calificación de operación es obligatoria";
         }
         if (!$this->baseImponibleOimporteNoSujeto) {
-            $errors[] = $prefix . "BaseImponibleOimporteNoSujeto is required";
+            $errors[] = $prefix . "La base imponible o importe no sujeto es obligatorio";
         }
         if (!$this->tipoImpositivo) {
-            $errors[] = $prefix . "TipoImpositivo is required";
+            $errors[] = $prefix . "El tipo impositivo es obligatorio";
         }
         if (!$this->cuotaRepercutida) {
-            $errors[] = $prefix . "CuotaRepercutida is required";
+            $errors[] = $prefix . "La cuota repercutida es obligatoria";
         }
         $operationTypeError = $this->validateOperationType();
         if ($operationTypeError) {
@@ -61,19 +66,19 @@ class VerifactuCuerpoDesglose {
         if (!isset($this->calificacionOperacion)) {
             return null;
         }
-        if (in_array($this->calificacionOperacion, [VerifactuOperationType::Subject, VerifactuOperationType::PassiveSubject], true)) {
+        if (in_array($this->calificacionOperacion, [TipoOperacion::Subject, TipoOperacion::PassiveSubject], true)) {
             if ($this->tipoImpositivo === null) {
-                return "TipoImpositivo is required for subject operation types";
+                return "El tipo impositivo es obligatorio para operaciones sujetas";
             }
             if ($this->cuotaRepercutida === null) {
-                return "CuotaRepercutida is required for subject operation types";
+                return "La cuota repercutida es obligatoria para operaciones sujetas";
             }
         } else {
             if ($this->tipoImpositivo !== null) {
-                return "TipoImpositivo cannot be defined for non-subject or exempt operation types";
+                return "El tipo impositivo no debe definirse para operaciones no sujetas o exentas";
             }
             if ($this->cuotaRepercutida !== null) {
-                return "CuotaRepercutida cannot be defined for non-subject or exempt operation types";
+                return "La cuota repercutida no debe definirse para operaciones no sujetas o exentas";
             }
         }
         return null;
@@ -102,11 +107,15 @@ class VerifactuCuerpoDesglose {
         }
         if (!$validTaxAmount) {
             $best = number_format($bestTaxAmount, 2, '.', '');
-            return "Expected tax amount of $best, got $taxAmountValue";
+            return "La cuota esperada es $best, pero se ha proporcionado $taxAmountValue";
         }
         return null;
     }
 
+    /**
+     * Convierte la línea de factura a formato array
+     * @return array
+     */
     public function toArray(): array {
         return [
             'Impuesto' => $this->tipoImpuesto,

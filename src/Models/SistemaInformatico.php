@@ -1,11 +1,12 @@
 <?php
 
-namespace arnaullfe\Verifactu\models\parts\cuerpo;
+namespace arnaullfe\Verifactu\Models;
+
 /**
- * Sistema informático de facturación
+ * Información sobre el sistema informático utilizado para generar la factura
  * @field SistemaInformatico
  */
-class VerifactuCuerpoSistemaInformatico {
+class SistemaInformatico {
     public string $vendorName;
     public string $vendorNif;
     public string $name;
@@ -16,6 +17,18 @@ class VerifactuCuerpoSistemaInformatico {
     public bool $supportsMultipleTaxpayers = false;
     public bool $hasMultipleTaxpayers = false;
 
+    /**
+     * Crea una nueva instancia del sistema informático
+     * @param string $id Identificador del sistema
+     * @param string $name Nombre del sistema
+     * @param string $vendorName Nombre del fabricante
+     * @param string $vendorNif NIF del fabricante
+     * @param string $version Versión del sistema
+     * @param string $installationNumber Número de instalación
+     * @param bool $onlySupportsVerifactu Indica si solo soporta Verifactu
+     * @param bool $supportsMultipleTaxpayers Indica si soporta múltiples contribuyentes
+     * @param bool $hasMultipleTaxpayers Indica si tiene múltiples contribuyentes configurados
+     */
     public function __construct($id,$name,$vendorName,$vendorNif,$version,$installationNumber,$onlySupportsVerifactu = true,$supportsMultipleTaxpayers = false,$hasMultipleTaxpayers = false) {
         $this->id = $id;
         $this->vendorName = $vendorName;
@@ -28,6 +41,10 @@ class VerifactuCuerpoSistemaInformatico {
         $this->hasMultipleTaxpayers = $hasMultipleTaxpayers;
     }
 
+    /**
+     * Convierte el sistema informático a formato array
+     * @return array
+     */
     public function toArray(): array {
         return [
             'NombreRazon' => $this->vendorName,
