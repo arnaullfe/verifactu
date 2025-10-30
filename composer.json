@@ -1,0 +1,22 @@
+{
+    "name": "arnaullfe/verifactu",
+    "description": "Librería para la implementación del sistema VERI*FACTU para la facturación electrónica en España",
+    "keywords": ["verifactu", "aeat", "espana", "facturacion", "electronica"],
+    "license": "MIT",
+    "homepage": "https://github.com/arnaullfe/verifactu",
+    "autoload": {
+        "psr-4": {
+            "arnaullfe\\Verifactu\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Arnau Llopart",
+            "homepage": "https://github.com/arnaullfe"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-soap": "*"
+    }
+}
