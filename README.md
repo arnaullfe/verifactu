@@ -61,7 +61,7 @@ $cuerpoFactura->importeTotal = "121.00";    // Total con IVA (100 + 21)
 
 // 6. Información del sistema (tu software de facturación)
 $cuerpoFactura->sistemaInformatico = new SistemaInformatico(
-    "1",                                    // ID del sistema
+    "77",                                    // ID del sistema informático (2 dígitos). Si eres colaborador te asignan un número propio; en caso contrario, usa 77 para software propio o no registrado.
     "Mi Sistema de Facturación",            // Nombre
     $EMISOR_NIF,                            // NIF del fabricante
     $EMISOR_NIF,                            // NIF del desarrollador

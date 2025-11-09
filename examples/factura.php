@@ -28,7 +28,7 @@ $cuerpoFactura->descripcionOperacion = "Venta de productos";
 $cuerpoFactura->destinatarios = [new IdentificacionFiscal("Cliente SA", "87654321B")];
 $cuerpoFactura->cuotaTotal = "21.00"; // string with 2 decimals - IVA
 $cuerpoFactura->importeTotal = "121.00"; // string with 2 decimals - subtotal + IVA
-$cuerpoFactura->sistemaInformatico = new SistemaInformatico("1", "Mi Sistema de Facturación", $EMISOR_NIF, $EMISOR_NIF, "1.0", "1");
+$cuerpoFactura->sistemaInformatico = new SistemaInformatico("77", "Mi Sistema de Facturación", $EMISOR_NIF, $EMISOR_NIF, "1.0", "1");
 $cuerpoFactura->desglose = [
   new LineaFactura("100.00", "21.00", "21.00")
 ];

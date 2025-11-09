@@ -31,7 +31,7 @@ $cuerpoFactura->descripcionOperacion = "Venta de productos sin IVA por educació
 $cuerpoFactura->destinatarios = [new IdentificacionFiscal("Cliente SA", "87654321B")];
 $cuerpoFactura->cuotaTotal = "0.00"; // string with 2 decimals - IVA
 $cuerpoFactura->importeTotal = "100.00"; // string with 2 decimals - subtotal + IVA
-$cuerpoFactura->sistemaInformatico = new SistemaInformatico("1", "Mi Sistema de Facturación", $EMISOR_NIF, $EMISOR_NIF, "1.0", "1");
+$cuerpoFactura->sistemaInformatico = new SistemaInformatico("77", "Mi Sistema de Facturación", $EMISOR_NIF, $EMISOR_NIF, "1.0", "1");
 $cuerpoFactura->desglose = [
   new LineaFactura("100.00", "00.00", "00.00", TipoImpuesto::IVA, TipoRegimen::C01, TipoOperacion::NonSubject)
 ];

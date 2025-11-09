@@ -10,7 +10,7 @@ class SistemaInformatico {
     public string $vendorName;
     public string $vendorNif;
     public string $name;
-    public string $id;
+    public string $id; // ID del sistema informático (2 dígitos). Si eres colaborador te asignan un número propio; en caso contrario, usa 77 para software propio o no registrado.
     public string $version;
     public string $installationNumber;
     public bool $onlySupportsVerifactu = true;
@@ -19,7 +19,7 @@ class SistemaInformatico {
 
     /**
      * Crea una nueva instancia del sistema informático
-     * @param string $id Identificador del sistema
+     * @param string $id // ID del sistema informático (2 dígitos). Si eres colaborador te asignan un número propio; en caso contrario, usa 77 para software propio o no registrado.
      * @param string $name Nombre del sistema
      * @param string $vendorName Nombre del fabricante
      * @param string $vendorNif NIF del fabricante
