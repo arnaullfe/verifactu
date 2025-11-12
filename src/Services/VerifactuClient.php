@@ -25,6 +25,9 @@ class VerifactuClient {
         );
         exec($command, $output, $status);
         if ($status !== 0) {
+            if(file_exists($pemPath)){
+              unlink($pemPath);
+            }
             throw new \RuntimeException('Error al convertir el certificado PFX a PEM');
         }
         return $pemPath;
