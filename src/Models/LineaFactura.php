@@ -66,19 +66,12 @@ class LineaFactura {
         if (!isset($this->calificacionOperacion)) {
             return null;
         }
-        if (in_array($this->calificacionOperacion, [TipoOperacion::Subject, TipoOperacion::PassiveSubject], true)) {
+        if ($this->lineaSujetaIva()) {
             if ($this->tipoImpositivo === null) {
                 return "El tipo impositivo es obligatorio para operaciones sujetas";
             }
             if ($this->cuotaRepercutida === null) {
                 return "La cuota repercutida es obligatoria para operaciones sujetas";
-            }
-        } else {
-            if ($this->tipoImpositivo !== null) {
-                return "El tipo impositivo no debe definirse para operaciones no sujetas o exentas";
-            }
-            if ($this->cuotaRepercutida !== null) {
-                return "La cuota repercutida no debe definirse para operaciones no sujetas o exentas";
             }
         }
         return null;
@@ -89,6 +82,7 @@ class LineaFactura {
             !isset($this->baseImponibleOimporteNoSujeto)
             || $this->tipoImpositivo === null
             || $this->cuotaRepercutida === null
+            || !$this->lineaSujetaIva()
         ) {
             return null;
         }
@@ -112,18 +106,26 @@ class LineaFactura {
         return null;
     }
 
+    private function lineaSujetaIva(): bool {
+        return in_array($this->calificacionOperacion, [TipoOperacion::Subject, TipoOperacion::PassiveSubject]);
+    }
+
     /**
      * Convierte la línea de factura a formato array
      * @return array
      */
     public function toArray(): array {
-        return [
+        $data = [
             'Impuesto' => $this->tipoImpuesto,
             'ClaveRegimen' => $this->claveRegimen,
             'CalificacionOperacion' => $this->calificacionOperacion,
             'BaseImponibleOimporteNoSujeto' => $this->baseImponibleOimporteNoSujeto,
-            'TipoImpositivo' => $this->tipoImpositivo,
-            'CuotaRepercutida' => $this->cuotaRepercutida
         ];
+        if($this->lineaSujetaIva()) {
+            $data['TipoImpositivo'] = $this->tipoImpositivo;
+            $data['CuotaRepercutida'] = $this->cuotaRepercutida;
+        }
+
+        return $data;
     }
 }
