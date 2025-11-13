@@ -107,7 +107,7 @@ class LineaFactura {
         }
         if (!$validTaxAmount) {
             $best = number_format($bestTaxAmount, 2, '.', '');
-            return "La cuota esperada es $best, pero se ha proporcionado $taxAmountValue";
+            return "La cuota esperada es $best, pero se ha proporcionado $taxAmountValue ya que la base es $base y el tipo impositivo es $rate";
         }
         return null;
     }
