@@ -18,5 +18,5 @@ enum TipoRectificativa: string {
      * de la factura original. La factura original sigue siendo válida,
      * y la rectificativa actúa como complemento.
   */
-    const DIFERENCIAS = 'R';
+    const DIFERENCIAS = 'I';
 }
