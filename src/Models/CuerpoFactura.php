@@ -23,6 +23,11 @@ class CuerpoFactura {
     public array $desglose;
     public string $tipoHuella = '01';
     public ?RegistroAnterior $registroAnterior = null;
+    public ?TipoRectificativa $tipoRectificativa = null;
+    /** @var IdFactura[] */
+    public ?array $facturasSustituidas = []; // Solo para facturas sustitutivas
+    public ?string $baseRectificada = null; // Solo para facturas rectificativas
+    public ?string $cuotaRectificada = null; // Solo para facturas rectificativas
 
     /**
      * Valida todos los datos del cuerpo de la factura
@@ -42,6 +47,10 @@ class CuerpoFactura {
         }
         if (!$this->tipoFactura) {
             $errors[] = "Cuerpo tipoFactura: El tipo de factura es obligatorio";
+        }else if(in_array($this->tipoFactura, [TipoFactura::R1, TipoFactura::R2, TipoFactura::R3, TipoFactura::R4, TipoFactura::R5])) {
+            if (!$this->tipoRectificativa) {
+                $errors[] = "Cuerpo tipoRectificativa: El tipo de rectificativa es obligatorio para facturas rectificativas";
+            }
         }
         if (!$this->destinatarios) {
             $errors[] = "Cuerpo destinatarios: Debe haber al menos un destinatario";
@@ -102,7 +111,7 @@ class CuerpoFactura {
                 'PrimerRegistro' => 'S',
             ];
         }
-        return [
+        $data = [
             'IDVersion' => $this->idVersion,
             'IDFactura' => $this->idFactura->toArray(),
             'NombreRazonEmisor' => $this->nombreRazonEmisor,
@@ -120,6 +129,24 @@ class CuerpoFactura {
             'Encadenamiento' => $encadenamiento,
             'FechaHoraHusoGenRegistro' => (new \DateTime())->format('c'),
         ];
+        if ($this->facturaIsRectificativa()) {
+            $data['TipoRectificativa'] = $this->tipoRectificativa;
+        }
+        if(count($this->facturasSustituidas) > 0) {
+          $data['FacturasSustituidas'] = [];
+          foreach($this->facturasSustituidas as $factura) {
+            $data['FacturasSustituidas'][] = [
+              'IDFacturaSustituida' => $factura->toArray(),
+            ];
+          }
+        }
+        if($this->baseRectificada !== null && $this->cuotaRectificada !== null) {
+          $data['ImporteRectificacion'] = [
+            'baseRectificada' => $this->baseRectificada,
+            'cuotaRectificada' => $this->cuotaRectificada,
+          ];
+        }
+        return $data;
     }
 
     /**
@@ -136,5 +163,9 @@ class CuerpoFactura {
             . '&Huella=' . ($this->registroAnterior ? $this->registroAnterior->huella : '')
             . '&FechaHoraHusoGenRegistro=' . (new \DateTime())->format('c');
         return strtoupper(hash('sha256', $payload));
+    }
+
+    private function facturaIsRectificativa(): bool {
+        return in_array($this->tipoFactura, [TipoFactura::R1, TipoFactura::R2, TipoFactura::R3, TipoFactura::R4, TipoFactura::R5]);
     }
 }
