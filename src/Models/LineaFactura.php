@@ -10,12 +10,17 @@ use arnaullfe\Verifactu\Models\TipoOperacion;
  * @field DetalleDesglose
  */
 class LineaFactura {
+    /** @var TipoImpuesto */
     public string $tipoImpuesto;
+    /** @var TipoRegimen */
     public string $claveRegimen;
+    /** @var TipoOperacion */
     public string $calificacionOperacion;
     public string $baseImponibleOimporteNoSujeto;
     public ?string $tipoImpositivo = null;
     public ?string $cuotaRepercutida = null;
+    public ?string $tipoCargoEquivalencia = null;
+    public ?string $cuotaRecargoEquivalencia = null;
 
     public function __construct($baseImponibleOimporteNoSujeto, $cuotaRepercutida, $tipoImpositivo = '21.00',$tipoImpuesto = TipoImpuesto::IVA, $claveRegimen = TipoRegimen::C01, $calificacionOperacion = TipoOperacion::Subject) {
         $this->tipoImpuesto = $tipoImpuesto;
@@ -66,7 +71,7 @@ class LineaFactura {
         if (!isset($this->calificacionOperacion)) {
             return null;
         }
-        if ($this->lineaSujetaIva()) {
+        if (!$this->lineaExentaIva()) {
             if ($this->tipoImpositivo === null) {
                 return "El tipo impositivo es obligatorio para operaciones sujetas";
             }
@@ -82,7 +87,7 @@ class LineaFactura {
             !isset($this->baseImponibleOimporteNoSujeto)
             || $this->tipoImpositivo === null
             || $this->cuotaRepercutida === null
-            || !$this->lineaSujetaIva()
+            || $this->lineaExentaIva()
         ) {
             return null;
         }
@@ -106,10 +111,6 @@ class LineaFactura {
         return null;
     }
 
-    private function lineaSujetaIva(): bool {
-        return in_array($this->calificacionOperacion, [TipoOperacion::Subject, TipoOperacion::PassiveSubject]);
-    }
-
     /**
      * Convierte la línea de factura a formato array
      * @return array
@@ -118,14 +119,39 @@ class LineaFactura {
         $data = [
             'Impuesto' => $this->tipoImpuesto,
             'ClaveRegimen' => $this->claveRegimen,
-            'CalificacionOperacion' => $this->calificacionOperacion,
             'BaseImponibleOimporteNoSujeto' => $this->baseImponibleOimporteNoSujeto,
         ];
-        if($this->lineaSujetaIva()) {
+        if($this->lineaExentaIva()) {
+          $data['OperacionExenta'] = $this->calificacionOperacion;
+        }else {
             $data['TipoImpositivo'] = $this->tipoImpositivo;
             $data['CuotaRepercutida'] = $this->cuotaRepercutida;
+            $data['CalificacionOperacion'] = $this->calificacionOperacion;
         }
 
+        if($this->tipoCargoEquivalencia !== null) {
+          $data['TipoCargoEquivalencia'] = $this->tipoCargoEquivalencia;
+        }
+        if($this->cuotaRecargoEquivalencia !== null) {
+          $data['CuotaRecargoEquivalencia'] = $this->cuotaRecargoEquivalencia;
+        }
         return $data;
     }
+
+
+  /**
+   * Indica si la operación está exenta de IVA
+   * @param TipoOperacion $operacion
+   * @return bool
+   */
+  private function lineaExentaIva(): bool {
+      return in_array($this->calificacionOperacion, [
+          TipoOperacion::ExemptByArticle20,
+          TipoOperacion::ExemptByArticle21,
+          TipoOperacion::ExemptByArticle22,
+          TipoOperacion::ExemptByArticles23And24,
+          TipoOperacion::ExemptByArticle25,
+          TipoOperacion::ExemptByOther
+      ], true);
+  }
 }

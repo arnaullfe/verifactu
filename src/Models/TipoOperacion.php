@@ -24,38 +24,4 @@ enum TipoOperacion: string {
     const ExemptByArticle25 = 'E5';
     /** Operación exenta por otros motivos */
     const ExemptByOther = 'E6';
-
-    /**
-     * Indica si la operación está sujeta a IVA
-     * @param TipoOperacion $operacion
-     * @return bool
-     */
-    public static function isSubject(self $operacion): bool {
-        return in_array($operacion, [self::Subject, self::PassiveSubject], true);
-    }
-
-    /**
-     * Indica si la operación no está sujeta a IVA
-     * @param TipoOperacion $operacion
-     * @return bool
-     */
-    public static function isNonSubject(self $operacion): bool {
-        return in_array($operacion, [self::NonSubject, self::NonSubjectByLocation], true);
-    }
-
-    /**
-     * Indica si la operación está exenta de IVA
-     * @param TipoOperacion $operacion
-     * @return bool
-     */
-    public static function isExempt(self $operacion): bool {
-        return in_array($operacion, [
-            self::ExemptByArticle20,
-            self::ExemptByArticle21,
-            self::ExemptByArticle22,
-            self::ExemptByArticles23And24,
-            self::ExemptByArticle25,
-            self::ExemptByOther
-        ], true);
-    }
 }
