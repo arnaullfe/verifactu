@@ -7,5 +7,6 @@ namespace arnaullfe\Verifactu\Models\Respuestas;
 enum VerifactuRespuestas {
     const CORRECTO = 'CORRECTO';
     const ACEPTADO_CON_ERRORES = 'ACEPTADOCONERRORES';
+    const PARCIALMENTE_CORRECTO = 'PARCIALMENTECORRECTO';
     const INCORRECTO = 'INCORRECTO';
 }

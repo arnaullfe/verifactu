@@ -77,7 +77,7 @@ class VerifactuClient {
             if (strtoupper($result->EstadoEnvio) === VerifactuRespuestas::CORRECTO) {
                 $isSuccess = true;
                 $message = "Factura enviada correctamente";
-            } elseif (strtoupper($result->EstadoEnvio) === VerifactuRespuestas::ACEPTADO_CON_ERRORES) {
+            } elseif (strtoupper($result->EstadoEnvio) === VerifactuRespuestas::ACEPTADO_CON_ERRORES || strtoupper($result->EstadoEnvio) === VerifactuRespuestas::PARCIALMENTE_CORRECTO) {
                 $isSuccess = true;
                 $message = "Factura enviada con errores";
             }else if(!empty($result->RespuestaLinea) && !empty($result->RespuestaLinea->DescripcionErrorRegistro)){
