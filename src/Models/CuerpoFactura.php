@@ -16,8 +16,8 @@ class CuerpoFactura {
     public string $descripcionOperacion;
     /** @var IdentificacionFiscal[]|IdentificacionFiscalExtranjera[] */
     public array $destinatarios;
-    public float $cuotaTotal; // TOTAL IMPUESTOS FACTURA, STRING 2 DECIMALES
-    public float $importeTotal; // TOTAL FACTURA, STRING 2 DECIMALES
+    public string $cuotaTotal; // TOTAL IMPUESTOS FACTURA, STRING 2 DECIMALES
+    public string $importeTotal; // TOTAL FACTURA, STRING 2 DECIMALES
     public $sistemaInformatico; // Se mantiene flexible para ediciones externas
     /** @var LineaFactura[] */
     public array $desglose;

@@ -22,10 +22,10 @@ class VerifactuQrGenerator {
     /**
      * Genera la URL del código QR para una factura
      * @param IdFactura $idFactura Identificador de la factura
-     * @param float $totalAmount Importe total de la factura
+     * @param string $totalAmount Importe total de la factura
      * @return string URL del código QR
      */
-    public function generateQr(IdFactura $idFactura, float $totalAmount): string {
+    public function generateQr(IdFactura $idFactura, string $totalAmount): string {
         $urlBase = $this->isProduction
             ? 'https://www2.agenciatributaria.gob.es'
             : 'https://prewww2.aeat.es';
