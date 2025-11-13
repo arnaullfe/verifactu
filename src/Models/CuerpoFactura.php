@@ -49,6 +49,11 @@ class CuerpoFactura {
         } elseif (strlen($this->nombreRazonEmisor) > 120) {
             $errors[] = "Cuerpo nombreRazonEmisor: El nombre no puede exceder 120 caracteres";
         }
+        if(!$this->descripcionOperacion) {
+            $errors[] = "Cuerpo descripcionOperacion: La descripción de la operación es obligatoria";
+        } elseif (strlen($this->descripcionOperacion) > 500) {
+            $errors[] = "Cuerpo descripcionOperacion: La descripción no puede exceder 500 caracteres";
+        }
         if (!$this->tipoFactura) {
             $errors[] = "Cuerpo tipoFactura: El tipo de factura es obligatorio";
         }else if(in_array($this->tipoFactura, [TipoFactura::R1, TipoFactura::R2, TipoFactura::R3, TipoFactura::R4, TipoFactura::R5])) {
@@ -85,6 +90,8 @@ class CuerpoFactura {
             $errors[] = "Cuerpo desglose: El desglose es obligatorio";
         } elseif (count($this->desglose) === 0) {
             $errors[] = "Cuerpo desglose: Debe haber al menos una línea en el desglose";
+        } elseif (count($this->desglose) > 12) {
+            $errors[] = "Cuerpo desglose: El desglose no puede tener más de 12 líneas";
         } else {
             $desgloseErrors = [];
             for ($index = 0; $index < count($this->desglose); $index++) {
