@@ -12,18 +12,22 @@ class CuerpoFactura {
     public string $idVersion = '1.0';
     public IdFactura $idFactura;
     public string $nombreRazonEmisor;
+    /** @var TipoFactura */
     public string $tipoFactura;
     public string $descripcionOperacion;
     /** @var IdentificacionFiscal[]|IdentificacionFiscalExtranjera[] */
     public array $destinatarios;
     public string $cuotaTotal; // TOTAL IMPUESTOS FACTURA, STRING 2 DECIMALES
     public string $importeTotal; // TOTAL FACTURA, STRING 2 DECIMALES
-    public $sistemaInformatico; // Se mantiene flexible para ediciones externas
+    /** @var SistemaInformatico */
+    public SistemaInformatico $sistemaInformatico;
     /** @var LineaFactura[] */
     public array $desglose;
+    /** @var string */
     public string $tipoHuella = '01';
     public ?RegistroAnterior $registroAnterior = null;
-    public ?TipoRectificativa $tipoRectificativa = null;
+    /** @var TipoRectificativa */
+    public ?string $tipoRectificativa = null; 
     /** @var IdFactura[] */
     public ?array $facturasSustituidas = []; // Solo para facturas sustitutivas
     public ?string $baseRectificada = null; // Solo para facturas rectificativas
