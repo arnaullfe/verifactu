@@ -51,13 +51,14 @@ $cuerpoFactura->idFactura = new IdFactura($EMISOR_NIF, "F-2025-2", new DateTime(
 $cuerpoFactura->nombreRazonEmisor = $EMISOR_NOMBRE;
 $cuerpoFactura->tipoFactura = TipoFactura::FACTURA;
 $cuerpoFactura->descripcionOperacion = "Venta de productos";
+$cuerpoFactura->fechaOperacion = new DateTime();
 $cuerpoFactura->destinatarios = [
     new IdentificacionFiscal("Cliente SA", "87654321B")
 ];
 
 // 5. Define los importes (en string con 2 decimales)
-$cuerpoFactura->cuotaTotal = "100.00";      // Subtotal sin IVA
-$cuerpoFactura->importeTotal = "121.00";    // Total con IVA (100 + 21)
+$cuerpoFactura->cuotaTotal = "21.00";       // Total impuestos (IVA)
+$cuerpoFactura->importeTotal = "121.00";    // Total factura (100 base + 21 IVA)
 
 // 6. Información del sistema (tu software de facturación)
 $cuerpoFactura->sistemaInformatico = new SistemaInformatico(
@@ -108,8 +109,11 @@ Si necesitas corregir una factura anterior, usa `TipoFactura::R1` y añade el re
 ```php
 // Solo si es una factura rectificativa
 $cuerpoFactura->tipoFactura = TipoFactura::R1;
-$cuerpoFactura->cuotaTotal = "-100.00";      // Negativo para rectificativas
-$cuerpoFactura->importeTotal = "-121.00";
+$cuerpoFactura->tipoRectificativa = TipoRectificativa::DIFERENCIAS;
+$cuerpoFactura->descripcionOperacion = "Rectificación de factura";
+$cuerpoFactura->fechaOperacion = new DateTime();
+$cuerpoFactura->cuotaTotal = "-21.00";      // Total impuestos (IVA) - negativo para rectificativas
+$cuerpoFactura->importeTotal = "-121.00";   // Total factura - negativo para rectificativas
 $cuerpoFactura->desglose = [
     new LineaFactura("-100.00", "21.00", "21.00")
 ];
@@ -132,8 +136,10 @@ use arnaullfe\Verifactu\Models\TipoImpuesto;
 use arnaullfe\Verifactu\Models\TipoRegimen;
 use arnaullfe\Verifactu\Models\TipoOperacion;
 
-$cuerpoFactura->cuotaTotal = "100.00";
-$cuerpoFactura->importeTotal = "100.00";     // Sin IVA
+$cuerpoFactura->descripcionOperacion = "Venta de productos sin IVA por educación";
+$cuerpoFactura->fechaOperacion = new DateTime();
+$cuerpoFactura->cuotaTotal = "0.00";         // Total impuestos (sin IVA)
+$cuerpoFactura->importeTotal = "100.00";     // Total factura (sin IVA)
 
 $cuerpoFactura->desglose = [
     new LineaFactura(
@@ -147,6 +153,56 @@ $cuerpoFactura->desglose = [
 ];
 ```
 
+### Cancelar Factura
+
+Para anular una factura previamente enviada:
+
+```php
+use arnaullfe\Verifactu\Models\CabeceraFactura;
+use arnaullfe\Verifactu\Models\CancelarFactura;
+use arnaullfe\Verifactu\Models\IdentificacionFiscal;
+use arnaullfe\Verifactu\Models\IdFactura;
+use arnaullfe\Verifactu\Models\SistemaInformatico;
+
+// 1. Crea la cabecera con el emisor
+$cabecera = new CabeceraFactura(
+    new IdentificacionFiscal('Mi Empresa SL', '12345678A')
+);
+
+// 2. Identifica la factura a cancelar (debe ser la misma que enviaste antes)
+$idFactura = new IdFactura(
+    '12345678A',                              // NIF del emisor
+    'F-2025-2',                               // Número de serie de la factura original
+    new DateTime('2025-03-15')                // Fecha de expedición de la factura original
+);
+
+// 3. Crea el registro de cancelación
+$cancelarFactura = new CancelarFactura(
+    $cabecera,
+    $idFactura,
+    new DateTime('2025-03-15T14:32:18+00:00'), // Fecha y hora de la cancelación
+    'HUELLA_DE_LA_FACTURA_ORIGINAL'           // Huella SHA-256 de la factura original
+);
+
+// 4. Información del sistema informático
+$cancelarFactura->sistemaInformatico = new SistemaInformatico(
+    '77',
+    'Mi Sistema de Facturación',
+    '12345678A',
+    '12345678A',
+    '1.0',
+    '1'
+);
+
+// 5. Envía la cancelación
+$cliente = new VerifactuClient();
+$cliente->setIsProduction(false);
+$cliente->setCertificate('ruta/al/certificado.pfx', 'contraseña', true);
+$res = $cliente->enviarFactura($cancelarFactura);
+```
+
+**Importante:** Necesitas la huella digital (SHA-256) de la factura original que guardaste cuando la enviaste. Esta huella se obtiene del método `toArray()` de la factura original.
+
 ### Múltiples Líneas de Desglose
 
 Si tienes diferentes tipos de IVA o regímenes:
@@ -158,9 +214,9 @@ $cuerpoFactura->desglose = [
     new LineaFactura("200.00", "42.00", "21.00")    // 21% IVA
 ];
 
-// El cuotaTotal debe ser la suma: 105 + 63 + 42 = 210.00
-$cuerpoFactura->cuotaTotal = "210.00";
-$cuerpoFactura->importeTotal = "1210.00";  // 1000 (base) + 210 (IVA)
+// El cuotaTotal debe ser la suma de impuestos: 105 + 63 + 42 = 210.00
+$cuerpoFactura->cuotaTotal = "210.00";      // Total impuestos (IVA)
+$cuerpoFactura->importeTotal = "1210.00";    // Total factura (1000 base + 210 IVA)
 ```
 
 ## Configuración
@@ -288,8 +344,9 @@ TipoRegimen::C20  // Régimen simplificado
 En la carpeta `examples/` encontrarás ejemplos listos para usar:
 
 - `factura.php` - Factura ordinaria con IVA
-- `facturaSiRectificativa.php` - Factura rectificativa
+- `facturaRectificativa.php` - Factura rectificativa
 - `facturaSinIva.php` - Factura sin IVA (exenta/no sujeta)
+- `cancelarFactura.php` - Cancelación/anulación de factura
 
 ## Manejo de Errores
 
