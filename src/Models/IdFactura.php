@@ -43,11 +43,22 @@ class IdFactura {
      * Convierte el identificador a formato array
      * @return array
      */
-    public function toArray(): array {
+    public function toArray($isAnulada = false): array {
+        if($isAnulada) {
+            return $this->toArrayAnulada();
+        }
         return [
             'IDEmisorFactura' => $this->idEmisorFactura,
             'NumSerieFactura' => $this->numSerieFactura,
             'FechaExpedicionFactura' => $this->fechaExpedicionFactura->format('d-m-Y'),
+        ];
+    }
+
+    public function toArrayAnulada(): array {
+        return [
+            'IDEmisorFacturaAnulada' => $this->idEmisorFactura,
+            'NumSerieFacturaAnulada' => $this->numSerieFactura,
+            'FechaExpedicionFacturaAnulada' => $this->fechaExpedicionFactura->format('d-m-Y'),
         ];
     }
 }

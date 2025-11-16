@@ -42,8 +42,12 @@ class VerifactuClient {
             $this->certificatePath = $certificatePath;
         }
     }
-
-    public function enviarFactura(Factura $factura): array {
+    /**
+     * Envía una factura a la AEAT
+     * @param Factura|CancelarFactura $factura
+     * @return array
+     */
+    public function enviarFactura($factura): array {
         try {
             $errors = $factura->validate();
             if (count($errors) > 0) {
