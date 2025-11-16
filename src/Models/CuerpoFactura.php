@@ -154,7 +154,7 @@ class CuerpoFactura {
           }
         }
         if(!empty($this->fechaOperacion)) {
-          $data['FechaOperacion'] = $this->fechaOperacion->format('Y-m-d');
+          $data['FechaOperacion'] = $this->fechaOperacion->format('d-m-Y');
         }
         if($this->baseRectificada !== null && $this->cuotaRectificada !== null) {
           $data['ImporteRectificacion'] = [
