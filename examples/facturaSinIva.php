@@ -27,6 +27,7 @@ $cuerpoFactura = new CuerpoFactura();
 $cuerpoFactura->idFactura = new IdFactura($EMISOR_NIF, "F-2025-2", new DateTime());
 $cuerpoFactura->nombreRazonEmisor = $EMISOR_NOMBRE;
 $cuerpoFactura->tipoFactura = TipoFactura::FACTURA;
+$cuerpoFactura->fechaOperacion = new DateTime();
 $cuerpoFactura->descripcionOperacion = "Venta de productos sin IVA por educación";
 $cuerpoFactura->destinatarios = [new IdentificacionFiscal("Cliente SA", "87654321B")];
 $cuerpoFactura->cuotaTotal = "0.00"; // string with 2 decimals - IVA

@@ -15,6 +15,8 @@ class CuerpoFactura {
     /** @var TipoFactura */
     public string $tipoFactura;
     public string $descripcionOperacion;
+    /** @var \DateTime */
+    public ?\DateTime $fechaOperacion = null;
     /** @var IdentificacionFiscal[]|IdentificacionFiscalExtranjera[] */
     public array $destinatarios;
     public string $cuotaTotal; // TOTAL IMPUESTOS FACTURA, STRING 2 DECIMALES
@@ -150,6 +152,9 @@ class CuerpoFactura {
               'IDFacturaSustituida' => $factura->toArray(),
             ];
           }
+        }
+        if(!empty($this->fechaOperacion)) {
+          $data['FechaOperacion'] = $this->fechaOperacion->format('Y-m-d');
         }
         if($this->baseRectificada !== null && $this->cuotaRectificada !== null) {
           $data['ImporteRectificacion'] = [

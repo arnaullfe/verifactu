@@ -11,9 +11,7 @@ use arnaullfe\Verifactu\Models\LineaFactura;
 use arnaullfe\Verifactu\Models\RegistroAnterior;
 use arnaullfe\Verifactu\Models\SistemaInformatico;
 use arnaullfe\Verifactu\Models\TipoFactura;
-use arnaullfe\Verifactu\Models\TipoImpuesto;
-use arnaullfe\Verifactu\Models\TipoOperacion;
-use arnaullfe\Verifactu\Models\TipoRegimen;
+use arnaullfe\Verifactu\Models\TipoRectificativa;
 use arnaullfe\Verifactu\Services\VerifactuClient;
 use arnaullfe\Verifactu\Services\VerifactuQrGenerator;
 
@@ -27,7 +25,9 @@ $cuerpoFactura = new CuerpoFactura();
 $cuerpoFactura->idFactura = new IdFactura($EMISOR_NIF, "F-2025-2", new DateTime());
 $cuerpoFactura->nombreRazonEmisor = $EMISOR_NOMBRE;
 $cuerpoFactura->tipoFactura = TipoFactura::R1;
+$cuerpoFactura->tipoRectificativa = TipoRectificativa::DIFERENCIAS;
 $cuerpoFactura->descripcionOperacion = "Rectificación de factura";
+$cuerpoFactura->fechaOperacion = new DateTime();
 $cuerpoFactura->destinatarios = [new IdentificacionFiscal("Cliente SA", "87654321B")];
 $cuerpoFactura->cuotaTotal = "-21.00"; // string with 2 decimals - IVA
 $cuerpoFactura->importeTotal = "-121.00"; // string with 2 decimals - subtotal + IVA

@@ -25,6 +25,7 @@ $cuerpoFactura->idFactura = new IdFactura($EMISOR_NIF, "F-2025-2", new DateTime(
 $cuerpoFactura->nombreRazonEmisor = $EMISOR_NOMBRE;
 $cuerpoFactura->tipoFactura = TipoFactura::FACTURA;
 $cuerpoFactura->descripcionOperacion = "Venta de productos";
+$cuerpoFactura->fechaOperacion = new DateTime();
 $cuerpoFactura->destinatarios = [new IdentificacionFiscal("Cliente SA", "87654321B")];
 $cuerpoFactura->cuotaTotal = "21.00"; // string with 2 decimals - IVA
 $cuerpoFactura->importeTotal = "121.00"; // string with 2 decimals - subtotal + IVA
